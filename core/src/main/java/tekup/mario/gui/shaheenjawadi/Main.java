@@ -2,33 +2,80 @@ package tekup.mario.gui.shaheenjawadi;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Texture image;
+    private ShapeRenderer shapeRenderer;
+
+    private Rectangle mario;
+    private Rectangle block;
+    private Rectangle mushroom;
+
+    private boolean hasMushroom;
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
-        image = new Texture("libgdx.png");
+        shapeRenderer = new ShapeRenderer();
+
+
+        mario = new Rectangle(100, 100, 50, 50);
+
+
+        block = new Rectangle(200, 200, 60, 60);
+
+
+        mushroom = new Rectangle(200, 300, 30, 30);
+
+        hasMushroom = false;
     }
 
     @Override
     public void render() {
-        ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-        batch.begin();
-        batch.draw(image, 140, 210);
-        batch.end();
+        // Clear the screen
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        handleInput();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(mario.x, mario.y, mario.width, mario.height);
+
+        shapeRenderer.setColor(Color.GRAY);
+        shapeRenderer.rect(block.x, block.y, block.width, block.height);
+
+        if (!hasMushroom) {
+            shapeRenderer.setColor(Color.GREEN);
+            shapeRenderer.rect(mushroom.x, mushroom.y, mushroom.width, mushroom.height);
+        }
+
+        shapeRenderer.end();
+    }
+
+    private void handleInput() {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            mario.x -= 200 * Gdx.graphics.getDeltaTime();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            mario.x += 200 * Gdx.graphics.getDeltaTime();
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            mario.y += 50;
+        }
+
+        if (!hasMushroom && mario.overlaps(mushroom)) {
+            hasMushroom = true;
+            System.out.println(" mushroom!");
+        }
     }
 
     @Override
     public void dispose() {
-        batch.dispose();
-        image.dispose();
+        shapeRenderer.dispose();
     }
 }
