@@ -1,6 +1,6 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
-class MarioContext {
+public class MarioContext {
     private MarioState state;
 
     public MarioContext() {
