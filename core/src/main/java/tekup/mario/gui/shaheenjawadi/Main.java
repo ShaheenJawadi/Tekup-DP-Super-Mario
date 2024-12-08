@@ -106,17 +106,35 @@ public class Main extends ApplicationAdapter {
             isJumping = false;
         }
 
-        // Update the cameraOffset to follow Mario
         cameraOffset = mario.x - 100;
 
-        // Update obstacle positions
+        for (Rectangle obstacle : obstacles) {
+            // Horizontal collision
+            if (mario.overlaps(obstacle)) {
+                if (mario.x < obstacle.x) { // Collision from the left
+                    mario.x = obstacle.x - mario.width;
+                } else if (mario.x > obstacle.x + obstacle.width) { // Collision from the right
+                    mario.x = obstacle.x + obstacle.width;
+                }
+            }
+
+            if (mario.overlaps(obstacle)) {
+                if (mario.y > obstacle.y + obstacle.height) { // Landing on top
+                    mario.y = obstacle.y + obstacle.height;
+                    velocityY = 0; // Stop downward velocity
+                    isJumping = false;
+                } else if (mario.y + mario.height < obstacle.y) { // Hitting the bottom
+                    velocityY = Math.min(velocityY, 0); // Ensure no upward velocity
+                }
+            }
+        }
+
         for (Rectangle obstacle : obstacles) {
             if (obstacle.x + obstacle.width < cameraOffset) {
                 obstacle.x = mario.x + 800 + (float) Math.random() * 300;
             }
         }
-
-        // Update power-up positions
+ 
         for (PowerUp powerUp : powerUps) {
             if (powerUp.getBounds().x + powerUp.getBounds().width < cameraOffset) {
                 powerUp.getBounds().x = mario.x + 800 + (float) Math.random() * 300;
