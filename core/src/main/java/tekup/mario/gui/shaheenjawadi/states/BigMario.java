@@ -16,4 +16,9 @@ class BigMario implements MarioState {
         System.out.println("Mario retourne à son état normal.");
         context.setState(new NormalMario());
     }
+
+    @Override
+    public float getHeight() {
+        return 70;
+    }
 }

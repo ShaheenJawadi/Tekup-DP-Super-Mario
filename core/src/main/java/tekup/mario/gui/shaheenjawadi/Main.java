@@ -9,17 +9,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import tekup.mario.gui.shaheenjawadi.states.MarioContext;
 import tekup.mario.gui.shaheenjawadi.utils.LogService;
 
 public class Main extends ApplicationAdapter {
     private ShapeRenderer shapeRenderer;
+    private MarioContext marioContext;
     private BitmapFont font;
     private SpriteBatch spriteBatch;
     private Rectangle mario;
-    private Rectangle block;
-    private Rectangle mushroom;
 
-    private boolean hasMushroom;
     private LogService logService;
     @Override
     public void create() {
@@ -27,15 +26,9 @@ public class Main extends ApplicationAdapter {
         spriteBatch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.WHITE);
-        mario = new Rectangle(100, 100, 50, 50);
 
+        mario = new Rectangle(100, 100, 50, marioContext.getCurrentHeight());
 
-        block = new Rectangle(200, 200, 60, 60);
-
-
-        mushroom = new Rectangle(200, 300, 30, 30);
-
-        hasMushroom = false;
 
         logService = LogService.getInstance();
     }
@@ -53,12 +46,7 @@ public class Main extends ApplicationAdapter {
         shapeRenderer.rect(mario.x, mario.y, mario.width, mario.height);
 
         shapeRenderer.setColor(Color.GRAY);
-        shapeRenderer.rect(block.x, block.y, block.width, block.height);
 
-        if (!hasMushroom) {
-            shapeRenderer.setColor(Color.GREEN);
-            shapeRenderer.rect(mushroom.x, mushroom.y, mushroom.width, mushroom.height);
-        }
 
         shapeRenderer.end();
         spriteBatch.begin();
@@ -70,7 +58,7 @@ public class Main extends ApplicationAdapter {
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             mario.x -= 200 * Gdx.graphics.getDeltaTime();
-
+            logService.log("move left");
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             mario.x += 200 * Gdx.graphics.getDeltaTime();
@@ -82,11 +70,7 @@ public class Main extends ApplicationAdapter {
 
         }
 
-        if (!hasMushroom && mario.overlaps(mushroom)) {
-            hasMushroom = true;
 
-            System.out.println(" mushroom!");
-        }
     }
 
     @Override

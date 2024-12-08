@@ -16,4 +16,9 @@ class NormalMario implements MarioState {
         System.out.println("Mario devient petit !");
         context.setState(new SmallMario());
     }
+
+    @Override
+    public float getHeight() {
+        return 55;
+    }
 }

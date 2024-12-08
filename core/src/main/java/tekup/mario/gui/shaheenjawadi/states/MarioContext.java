@@ -22,4 +22,9 @@ public class MarioContext {
     public void takeDamage() {
         state.takeDamage(this);
     }
+
+    public float getCurrentHeight() {
+        return state.getHeight();
+    }
+
 }

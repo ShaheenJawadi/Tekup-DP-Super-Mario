@@ -24,6 +24,7 @@ public class LogService {
     }
 
     public void log(String message) {
+        System.out.println(message);
         if (logs.size() >= MAX_LOGS) {
             logs.removeFirst();
         }

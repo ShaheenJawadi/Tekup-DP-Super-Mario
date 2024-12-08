@@ -16,4 +16,9 @@ class SmallMario implements MarioState {
         System.out.println("Mario perd une vie !");
         // Reset state or handle game over
     }
+
+    @Override
+    public float getHeight() {
+        return 40;
+    }
 }
