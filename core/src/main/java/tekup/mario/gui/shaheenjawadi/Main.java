@@ -31,7 +31,10 @@ public class Main extends ApplicationAdapter {
     private ArrayList<Rectangle> obstacles;
     private ArrayList<PowerUp> powerUps;
     private double cameraOffset;
-
+    private float velocityY = 0;
+    private final float gravity = -400;
+    private final float jumpStrength = 250;
+    private boolean isJumping = false;
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
@@ -48,6 +51,7 @@ public class Main extends ApplicationAdapter {
         cameraOffset = 0;
 
         generateLevel();
+
     }
 
 
@@ -107,15 +111,14 @@ public class Main extends ApplicationAdapter {
         powerUps.add(new PowerUp(new Rectangle(700, 150, 30, 30), "Star"));
     }
 
+
+
     private void updateLevel() {
-
         float speed = 200 * Gdx.graphics.getDeltaTime();
-
 
         for (Rectangle obstacle : obstacles) {
             obstacle.x -= speed;
             if (obstacle.x + obstacle.width < mario.x - 100) {
-
                 obstacle.x = (float) (mario.x + 800 + Math.random() * 300);
             }
         }
@@ -123,7 +126,6 @@ public class Main extends ApplicationAdapter {
         for (PowerUp powerUp : powerUps) {
             powerUp.getBounds().x -= speed;
             if (powerUp.getBounds().x + powerUp.getBounds().width < mario.x - 100) {
-
                 if (powerUp.getType().equals("Mushroom")) {
                     powerUp.getBounds().x = (float) (mario.x + 800 + Math.random() * 300);
                 } else if (powerUp.getType().equals("Star")) {
@@ -139,8 +141,20 @@ public class Main extends ApplicationAdapter {
                 obstacles.add(new Rectangle((float) (mario.x + 800 + Math.random() * 300), (float) (Math.random() * 200), 50, 50));
             }
         }
-    }
 
+        // Apply gravity to Mario's vertical velocity
+        velocityY += gravity * Gdx.graphics.getDeltaTime();  // Apply gravity to velocity
+
+        // Update Mario's vertical position
+        mario.y += velocityY * Gdx.graphics.getDeltaTime();
+
+
+        if (mario.y <= 100) {
+            mario.y = 100;  // Ensure Mario is not below the ground
+            velocityY = 0;  // Stop downward velocity
+            isJumping = false;  // Allow Mario to jump again
+        }
+    }
     private void handleInput() {
 
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -151,11 +165,11 @@ public class Main extends ApplicationAdapter {
         }
 
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            mario.y += 50;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isJumping) {
+            velocityY = jumpStrength;  // Set upward velocity
+            isJumping = true;  // Mark Mario as in the air
         }
     }
-
     private void checkCollisions() {
         // Check collisions with power-ups and obstacles
         Iterator<PowerUp> powerUpIterator = powerUps.iterator();
@@ -176,10 +190,6 @@ public class Main extends ApplicationAdapter {
             }
         }
     }
-
-
-
-
 
 
 
