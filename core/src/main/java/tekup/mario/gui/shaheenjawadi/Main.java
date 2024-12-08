@@ -35,6 +35,8 @@ public class Main extends ApplicationAdapter {
     private final float jumpStrength = 250;
     private boolean isJumping = false;
 
+    private float cameraOffset = 0; // Camera offset to track Mario
+
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
@@ -62,11 +64,11 @@ public class Main extends ApplicationAdapter {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(mario.x, mario.y, mario.width, mario.height);
+        shapeRenderer.rect(mario.x - cameraOffset, mario.y, mario.width, mario.height);
 
         shapeRenderer.setColor(Color.GRAY);
         for (Rectangle obstacle : obstacles) {
-            shapeRenderer.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            shapeRenderer.rect(obstacle.x - cameraOffset, obstacle.y, obstacle.width, obstacle.height);
         }
 
         for (PowerUp powerUp : powerUps) {
@@ -75,7 +77,7 @@ public class Main extends ApplicationAdapter {
             } else if (powerUp.getType().equals("Star")) {
                 shapeRenderer.setColor(Color.YELLOW);
             }
-            shapeRenderer.rect(powerUp.getBounds().x, powerUp.getBounds().y, powerUp.getBounds().width, powerUp.getBounds().height);
+            shapeRenderer.rect(powerUp.getBounds().x - cameraOffset, powerUp.getBounds().y, powerUp.getBounds().width, powerUp.getBounds().height);
         }
 
         shapeRenderer.end();
@@ -104,18 +106,19 @@ public class Main extends ApplicationAdapter {
             isJumping = false;
         }
 
-        Iterator<Rectangle> obstacleIterator = obstacles.iterator();
-        while (obstacleIterator.hasNext()) {
-            Rectangle obstacle = obstacleIterator.next();
-            if (obstacle.x + obstacle.width < 0) {
+        // Update the cameraOffset to follow Mario
+        cameraOffset = mario.x - 100;
+
+        // Update obstacle positions
+        for (Rectangle obstacle : obstacles) {
+            if (obstacle.x + obstacle.width < cameraOffset) {
                 obstacle.x = mario.x + 800 + (float) Math.random() * 300;
             }
         }
 
-        Iterator<PowerUp> powerUpIterator = powerUps.iterator();
-        while (powerUpIterator.hasNext()) {
-            PowerUp powerUp = powerUpIterator.next();
-            if (powerUp.getBounds().x + powerUp.getBounds().width < 0) {
+        // Update power-up positions
+        for (PowerUp powerUp : powerUps) {
+            if (powerUp.getBounds().x + powerUp.getBounds().width < cameraOffset) {
                 powerUp.getBounds().x = mario.x + 800 + (float) Math.random() * 300;
             }
         }
