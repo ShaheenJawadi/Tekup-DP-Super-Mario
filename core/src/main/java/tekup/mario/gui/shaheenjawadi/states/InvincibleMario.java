@@ -1,6 +1,6 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
-class InvincibleMario implements MarioState {
+public class InvincibleMario implements MarioState {
     @Override
     public void jump() {
         System.out.println("Mario saute avec invincibilité !");

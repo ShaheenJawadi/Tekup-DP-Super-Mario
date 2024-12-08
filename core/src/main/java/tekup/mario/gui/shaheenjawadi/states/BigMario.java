@@ -1,6 +1,6 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
-class BigMario implements MarioState {
+public class BigMario implements MarioState {
     @Override
     public void jump() {
         System.out.println("Mario saute plus haut.");

@@ -2,7 +2,7 @@ package tekup.mario.gui.shaheenjawadi.decorator;
 
 import tekup.mario.gui.shaheenjawadi.states.MarioContext;
 
-class Mushroom extends MarioPowerUpDecorator {
+public class Mushroom extends MarioPowerUpDecorator {
     public Mushroom(MarioContext mario) {
         super(mario);
     }

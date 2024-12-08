@@ -1,6 +1,6 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
-class SmallMario implements MarioState {
+public class SmallMario implements MarioState {
     @Override
     public void jump() {
         System.out.println("Mario saute mais atteint moins haut.");

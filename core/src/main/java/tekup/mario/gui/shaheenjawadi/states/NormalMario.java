@@ -1,6 +1,6 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
-class NormalMario implements MarioState {
+public class NormalMario implements MarioState {
     @Override
     public void jump() {
         System.out.println("Mario saute normalement.");
