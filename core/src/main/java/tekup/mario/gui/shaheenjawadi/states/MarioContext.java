@@ -1,12 +1,16 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
+import tekup.mario.gui.shaheenjawadi.decorator.MarioPowerUpDecorator;
+
 public class MarioContext {
     private MarioState state;
 
     public MarioContext() {
         this.state = new NormalMario();
     }
-
+    public void applyPowerUp(MarioPowerUpDecorator powerUp) {
+        this.state =   powerUp;
+    }
     public void setState(MarioState state) {
         this.state = state;
     }

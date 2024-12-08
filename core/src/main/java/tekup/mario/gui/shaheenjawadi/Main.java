@@ -195,13 +195,13 @@ public class Main extends ApplicationAdapter {
                 powerUpIterator.remove();
 
                 if (powerUp.getType().equals("Mushroom")) {
-                    marioContext.setState(new BigMario());
+                    marioContext.applyPowerUp(new Mushroom());
                     mario.height = marioContext.getCurrentHeight();
                     bigMarioTimer = 10;
                     invincibleMarioTimer = 0;
                     logService.log("Mario took a Mushroom and became Big Mario!");
                 } else if (powerUp.getType().equals("Star")) {
-                    marioContext.setState(new InvincibleMario());
+                    marioContext.applyPowerUp(new Star());
                     mario.height = marioContext.getCurrentHeight();
                     invincibleMarioTimer = 10;
                     bigMarioTimer = 0;

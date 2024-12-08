@@ -3,22 +3,30 @@ package tekup.mario.gui.shaheenjawadi.decorator;
 import tekup.mario.gui.shaheenjawadi.states.MarioContext;
 import tekup.mario.gui.shaheenjawadi.states.MarioState;
 
-abstract class MarioPowerUpDecorator extends MarioContext {
-    protected MarioContext mario;
+public abstract class MarioPowerUpDecorator implements MarioState  {
+    protected MarioState marioState;
 
-    public MarioPowerUpDecorator(MarioContext mario) {
-        this.mario = mario;
+    public MarioPowerUpDecorator(MarioState marioState) {
+        this.marioState = marioState;
     }
-
-
 
     @Override
     public void jump() {
-        mario.jump();
+        marioState.jump(); // Delegate to the wrapped state
     }
 
     @Override
     public void run() {
-        mario.run();
+        marioState.run(); // Delegate to the wrapped state
+    }
+
+    @Override
+    public void takeDamage(MarioContext context) {
+        marioState.takeDamage(context); // Delegate to the wrapped state
+    }
+
+    @Override
+    public float getHeight() {
+        return marioState.getHeight(); // Delegate to the wrapped state
     }
 }

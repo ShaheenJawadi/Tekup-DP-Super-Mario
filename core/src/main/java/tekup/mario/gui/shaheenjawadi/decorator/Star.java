@@ -1,10 +1,12 @@
 package tekup.mario.gui.shaheenjawadi.decorator;
 
+import tekup.mario.gui.shaheenjawadi.states.InvincibleMario;
 import tekup.mario.gui.shaheenjawadi.states.MarioContext;
+import tekup.mario.gui.shaheenjawadi.states.MarioState;
 
 public class Star extends MarioPowerUpDecorator {
-    public Star(MarioContext mario) {
-        super(mario);
+    public Star( ) {
+        super(new InvincibleMario());
     }
 
     @Override
