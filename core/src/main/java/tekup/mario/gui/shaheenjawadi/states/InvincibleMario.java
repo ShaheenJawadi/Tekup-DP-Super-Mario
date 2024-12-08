@@ -3,12 +3,12 @@ package tekup.mario.gui.shaheenjawadi.states;
 public class InvincibleMario implements MarioState {
     @Override
     public void jump() {
-        System.out.println("Mario saute avec invincibilité !");
+        logService.log("Mario jumps with invincibility!");
     }
 
     @Override
     public void run() {
-        System.out.println("Mario court sans peur !");
+        logService.log("Mario runs without fear!");
     }
     @Override
     public float getHeight() {
@@ -17,7 +17,7 @@ public class InvincibleMario implements MarioState {
 
     @Override
     public void takeDamage(MarioContext context) {
-        System.out.println("Mario est invincible, aucun dégât !");
+        logService.log("Mario is invincible, no damage!");
     }
 
 

@@ -9,8 +9,5 @@ public class Mushroom extends MarioPowerUpDecorator {
         super(new BigMario());
     }
 
-    @Override
-    public void jump() {
-        System.out.println("Mario saute avec plus de puissance !");
-    }
+
 }

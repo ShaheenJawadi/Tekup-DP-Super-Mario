@@ -9,8 +9,5 @@ public class Star extends MarioPowerUpDecorator {
         super(new InvincibleMario());
     }
 
-    @Override
-    public void run() {
-        System.out.println("Mario court avec invincibilité !");
-    }
+
 }

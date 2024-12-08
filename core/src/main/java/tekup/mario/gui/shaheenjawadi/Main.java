@@ -176,14 +176,17 @@ public class Main extends ApplicationAdapter {
     private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             mario.x -= 200 * Gdx.graphics.getDeltaTime();
+            marioContext.run();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             mario.x += 200 * Gdx.graphics.getDeltaTime();
+            marioContext.run();
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && !isJumping) {
             velocityY = jumpStrength;
             isJumping = true;
+            marioContext.jump();
         }
     }
 

@@ -3,17 +3,18 @@ package tekup.mario.gui.shaheenjawadi.states;
 public class BigMario implements MarioState {
     @Override
     public void jump() {
-        System.out.println("Mario saute plus haut.");
+        logService.log("Mario jumps higher.");
     }
 
     @Override
     public void run() {
-        System.out.println("Mario court normalement.");
+
+        logService.log("Mario runs normally.");
     }
 
     @Override
     public void takeDamage(MarioContext context) {
-        System.out.println("Mario retourne à son état normal.");
+        logService.log("Mario returns to his normal state.");
         context.setState(new NormalMario());
     }
 

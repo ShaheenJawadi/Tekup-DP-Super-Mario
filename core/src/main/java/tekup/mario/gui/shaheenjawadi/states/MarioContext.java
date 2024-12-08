@@ -1,8 +1,10 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
 import tekup.mario.gui.shaheenjawadi.decorator.MarioPowerUpDecorator;
+import tekup.mario.gui.shaheenjawadi.utils.LogService;
 
 public class MarioContext {
+
     private MarioState state;
 
     public MarioContext() {

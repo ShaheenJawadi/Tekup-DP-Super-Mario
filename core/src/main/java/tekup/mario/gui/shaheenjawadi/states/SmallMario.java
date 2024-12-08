@@ -1,20 +1,24 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
+import tekup.mario.gui.shaheenjawadi.utils.LogService;
+
 public class SmallMario implements MarioState {
+
     @Override
     public void jump() {
-        System.out.println("Mario saute mais atteint moins haut.");
+        logService.log("Mario jumps reached but not as high.");
     }
 
     @Override
     public void run() {
-        System.out.println("Mario court mais est plus lent.");
+
+        logService.log("Mario runs but is slower.");
     }
 
     @Override
     public void takeDamage(MarioContext context) {
-        System.out.println("Mario perd une vie !");
-        // Reset state or handle game over
+
+        logService.log("Mario loses a life!");
     }
 
     @Override

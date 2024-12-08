@@ -1,19 +1,22 @@
 package tekup.mario.gui.shaheenjawadi.states;
 
+import tekup.mario.gui.shaheenjawadi.utils.LogService;
+
 public class NormalMario implements MarioState {
+
     @Override
     public void jump() {
-        System.out.println("Mario saute normalement.");
+        logService.log("Mario jumps normally.");
     }
 
     @Override
     public void run() {
-        System.out.println("Mario court normalement.");
+        logService.log("Mario runs normally.");
     }
 
     @Override
     public void takeDamage(MarioContext context) {
-        System.out.println("Mario devient petit !");
+
         context.setState(new SmallMario());
     }
 
