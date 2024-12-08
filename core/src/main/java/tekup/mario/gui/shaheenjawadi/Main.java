@@ -14,6 +14,7 @@ import tekup.mario.gui.shaheenjawadi.decorator.Star;
 import tekup.mario.gui.shaheenjawadi.states.BigMario;
 import tekup.mario.gui.shaheenjawadi.states.InvincibleMario;
 import tekup.mario.gui.shaheenjawadi.states.MarioContext;
+import tekup.mario.gui.shaheenjawadi.states.NormalMario;
 import tekup.mario.gui.shaheenjawadi.utils.LogService;
 import tekup.mario.gui.shaheenjawadi.utils.PowerUp;
 
@@ -30,12 +31,16 @@ public class Main extends ApplicationAdapter {
     private LogService logService;
     private ArrayList<Rectangle> obstacles;
     private ArrayList<PowerUp> powerUps;
+
     private float velocityY = 0;
     private final float gravity = -400;
     private final float jumpStrength = 250;
     private boolean isJumping = false;
 
     private float cameraOffset = 0; // Camera offset to track Mario
+
+    private float bigMarioTimer = 0;
+    private float invincibleMarioTimer = 0;
 
     @Override
     public void create() {
@@ -60,6 +65,7 @@ public class Main extends ApplicationAdapter {
         handleInput();
         checkCollisions();
         updateLevel();
+        updateTimers();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
@@ -109,22 +115,21 @@ public class Main extends ApplicationAdapter {
         cameraOffset = mario.x - 100;
 
         for (Rectangle obstacle : obstacles) {
-            // Horizontal collision
             if (mario.overlaps(obstacle)) {
-                if (mario.x < obstacle.x) { // Collision from the left
+                if (mario.x < obstacle.x) {
                     mario.x = obstacle.x - mario.width;
-                } else if (mario.x > obstacle.x + obstacle.width) { // Collision from the right
+                } else if (mario.x > obstacle.x + obstacle.width) {
                     mario.x = obstacle.x + obstacle.width;
                 }
             }
 
             if (mario.overlaps(obstacle)) {
-                if (mario.y > obstacle.y + obstacle.height) { // Landing on top
+                if (mario.y > obstacle.y + obstacle.height) {
                     mario.y = obstacle.y + obstacle.height;
-                    velocityY = 0; // Stop downward velocity
+                    velocityY = 0;
                     isJumping = false;
-                } else if (mario.y + mario.height < obstacle.y) { // Hitting the bottom
-                    velocityY = Math.min(velocityY, 0); // Ensure no upward velocity
+                } else if (mario.y + mario.height < obstacle.y) {
+                    velocityY = Math.min(velocityY, 0);
                 }
             }
         }
@@ -134,10 +139,33 @@ public class Main extends ApplicationAdapter {
                 obstacle.x = mario.x + 800 + (float) Math.random() * 300;
             }
         }
- 
+
         for (PowerUp powerUp : powerUps) {
             if (powerUp.getBounds().x + powerUp.getBounds().width < cameraOffset) {
                 powerUp.getBounds().x = mario.x + 800 + (float) Math.random() * 300;
+            }
+        }
+    }
+
+    private void updateTimers() {
+        float deltaTime = Gdx.graphics.getDeltaTime();
+
+        // Decrease timers
+        if (bigMarioTimer > 0) {
+            bigMarioTimer -= deltaTime;
+            if (bigMarioTimer <= 0) {
+                marioContext.setState(new NormalMario());
+                mario.height = marioContext.getCurrentHeight();
+                logService.log("Big Mario effect ended.");
+            }
+        }
+
+        if (invincibleMarioTimer > 0) {
+            invincibleMarioTimer -= deltaTime;
+            if (invincibleMarioTimer <= 0) {
+                marioContext.setState(new NormalMario());
+                mario.height = marioContext.getCurrentHeight();
+                logService.log("Invincibility effect ended.");
             }
         }
     }
@@ -166,10 +194,14 @@ public class Main extends ApplicationAdapter {
                 if (powerUp.getType().equals("Mushroom")) {
                     marioContext.setState(new BigMario());
                     mario.height = marioContext.getCurrentHeight();
+                    bigMarioTimer = 10;
+                    invincibleMarioTimer = 0;
                     logService.log("Mario took a Mushroom and became Big Mario!");
                 } else if (powerUp.getType().equals("Star")) {
                     marioContext.setState(new InvincibleMario());
                     mario.height = marioContext.getCurrentHeight();
+                    invincibleMarioTimer = 10;
+                    bigMarioTimer = 0;
                     logService.log("Mario took a Star and became Invincible!");
                 }
             }
