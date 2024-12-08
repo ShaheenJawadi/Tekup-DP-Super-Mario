@@ -114,6 +114,9 @@ public class Main extends ApplicationAdapter {
 
         cameraOffset = mario.x - 100;
 
+        if(!(marioContext.getState() instanceof InvincibleMario)){
+
+
         for (Rectangle obstacle : obstacles) {
             if (mario.overlaps(obstacle)) {
                 if (mario.x < obstacle.x) {
@@ -133,7 +136,7 @@ public class Main extends ApplicationAdapter {
                 }
             }
         }
-
+    }
         for (Rectangle obstacle : obstacles) {
             if (obstacle.x + obstacle.width < cameraOffset) {
                 obstacle.x = mario.x + 800 + (float) Math.random() * 300;

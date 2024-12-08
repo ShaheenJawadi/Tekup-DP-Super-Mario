@@ -11,6 +11,10 @@ public class MarioContext {
         this.state = state;
     }
 
+    public MarioState getState() {
+        return state;
+    }
+
     public void jump() {
         state.jump();
     }
