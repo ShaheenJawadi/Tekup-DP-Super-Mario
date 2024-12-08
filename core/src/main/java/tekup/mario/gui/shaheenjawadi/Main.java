@@ -15,6 +15,7 @@ import tekup.mario.gui.shaheenjawadi.states.BigMario;
 import tekup.mario.gui.shaheenjawadi.states.InvincibleMario;
 import tekup.mario.gui.shaheenjawadi.states.MarioContext;
 import tekup.mario.gui.shaheenjawadi.utils.LogService;
+import tekup.mario.gui.shaheenjawadi.utils.PowerUp;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,8 +29,8 @@ public class Main extends ApplicationAdapter {
 
     private LogService logService;
     private ArrayList<Rectangle> obstacles;
-    private ArrayList<Rectangle> powerUps;
-    private float cameraOffset;
+    private ArrayList<PowerUp> powerUps;
+    private double cameraOffset;
 
     @Override
     public void create() {
@@ -43,45 +44,41 @@ public class Main extends ApplicationAdapter {
         mario = new Rectangle(100, 100, 50, marioContext.getCurrentHeight());
 
         obstacles = new ArrayList<>();
-        powerUps = new ArrayList<>();
+        powerUps = new ArrayList<PowerUp>();
         cameraOffset = 0;
 
         generateLevel();
     }
 
-    private void generateLevel() {
-        // Generate initial obstacles and power-ups
-        for (int i = 1; i <= 5; i++) {
-            obstacles.add(new Rectangle(300 * i, 100, 50, 50));
-        }
 
-        powerUps.add(new Rectangle(600, 150, 30, 30)); // Mushroom
-        powerUps.add(new Rectangle(1200, 150, 30, 30)); // Star
-    }
+
 
     @Override
     public void render() {
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         handleInput();
-        updateLevel();
         checkCollisions();
+        updateLevel();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(mario.x, mario.y, mario.width, marioContext.getCurrentHeight());
-
+        shapeRenderer.rect(mario.x, mario.y, mario.width, mario.height);
 
         shapeRenderer.setColor(Color.GRAY);
         for (Rectangle obstacle : obstacles) {
-            shapeRenderer.rect(obstacle.x - cameraOffset, obstacle.y, obstacle.width, obstacle.height);
+            shapeRenderer.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         }
 
-        for (Rectangle powerUp : powerUps) {
-            shapeRenderer.setColor(powerUps.indexOf(powerUp) == 0 ? Color.GREEN : Color.YELLOW);
-            shapeRenderer.rect(powerUp.x - cameraOffset, powerUp.y, powerUp.width, powerUp.height);
+        for (PowerUp powerUp : powerUps) {
+            if (powerUp.getType().equals("Mushroom")) {
+                shapeRenderer.setColor(Color.GREEN);
+            } else if (powerUp.getType().equals("Star")) {
+                shapeRenderer.setColor(Color.YELLOW);
+            }
+            shapeRenderer.rect(powerUp.getBounds().x, powerUp.getBounds().y, powerUp.getBounds().width, powerUp.getBounds().height);
         }
 
         shapeRenderer.end();
@@ -91,70 +88,111 @@ public class Main extends ApplicationAdapter {
         spriteBatch.end();
     }
 
-    private void handleInput() {
-        float delta = Gdx.graphics.getDeltaTime();
-        float speed = 200 * delta;
 
-        float leftBoundary = 100;
-        float rightBoundary = Gdx.graphics.getWidth() * 0.7f;
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.x > leftBoundary) {
-            mario.x -= speed;
 
+
+
+
+
+
+
+
+    private void generateLevel() {
+        for (int i = 1; i <= 5; i++) {
+            obstacles.add(new Rectangle(300 * i, 100, 50, 50));
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 
-            if (mario.x < rightBoundary) {
-                mario.x += speed;
-            } else {
-
-                cameraOffset += speed;
-            }
-
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            mario.y += 50;
-
-        }
+        powerUps.add(new PowerUp(new Rectangle(350, 150, 30, 30), "Mushroom"));
+        powerUps.add(new PowerUp(new Rectangle(700, 150, 30, 30), "Star"));
     }
-
 
     private void updateLevel() {
-        // Remove obstacles and power-ups that are off-screen
-        obstacles.removeIf(obstacle -> obstacle.x - cameraOffset + obstacle.width < 0);
-        powerUps.removeIf(powerUp -> powerUp.x - cameraOffset + powerUp.width < 0);
 
-        // Add new obstacles and power-ups dynamically
-        while (obstacles.size() < 5) {
-            obstacles.add(new Rectangle(cameraOffset + Gdx.graphics.getWidth() + (float) Math.random() * 300, 100, 50, 50));
+        float speed = 200 * Gdx.graphics.getDeltaTime();
+
+
+        for (Rectangle obstacle : obstacles) {
+            obstacle.x -= speed;
+            if (obstacle.x + obstacle.width < mario.x - 100) {
+
+                obstacle.x = (float) (mario.x + 800 + Math.random() * 300);
+            }
         }
-        while (powerUps.size() < 2) {
-            powerUps.add(new Rectangle(cameraOffset + Gdx.graphics.getWidth() + (float) Math.random() * 300, 150, 30, 30));
+
+        for (PowerUp powerUp : powerUps) {
+            powerUp.getBounds().x -= speed;
+            if (powerUp.getBounds().x + powerUp.getBounds().width < mario.x - 100) {
+
+                if (powerUp.getType().equals("Mushroom")) {
+                    powerUp.getBounds().x = (float) (mario.x + 800 + Math.random() * 300);
+                } else if (powerUp.getType().equals("Star")) {
+                    powerUp.getBounds().x = (float) (mario.x + 1000 + Math.random() * 300);
+                }
+            }
+        }
+
+        if (Math.random() < 0.01) {
+            if (Math.random() < 0.5) {
+                powerUps.add(new PowerUp(new Rectangle((float) (mario.x + 800 + Math.random() * 300), (float) (Math.random() * 200), 30, 30), "Mushroom"));
+            } else {
+                obstacles.add(new Rectangle((float) (mario.x + 800 + Math.random() * 300), (float) (Math.random() * 200), 50, 50));
+            }
         }
     }
 
+    private void handleInput() {
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            mario.x -= 200 * Gdx.graphics.getDeltaTime();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            mario.x += 200 * Gdx.graphics.getDeltaTime();
+        }
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            mario.y += 50;
+        }
+    }
 
     private void checkCollisions() {
-        // Check collisions with power-ups
-        Iterator<Rectangle> powerUpIterator = powerUps.iterator();
+        // Check collisions with power-ups and obstacles
+        Iterator<PowerUp> powerUpIterator = powerUps.iterator();
         while (powerUpIterator.hasNext()) {
-            Rectangle powerUp = powerUpIterator.next();
-            if (mario.overlaps(new Rectangle(powerUp.x - cameraOffset, powerUp.y, powerUp.width, powerUp.height))) {
+            PowerUp powerUp = powerUpIterator.next();
+            if (mario.overlaps(new Rectangle((float) (powerUp.getBounds().x - cameraOffset), powerUp.getBounds().y, powerUp.getBounds().width, powerUp.getBounds().height))) {
                 powerUpIterator.remove();
 
-                if (powerUps.indexOf(powerUp) == 0) { // Mushroom
-                    marioContext = new Mushroom(marioContext);
+                if (powerUp.getType().equals("Mushroom")) {
                     marioContext.setState(new BigMario());
                     mario.height = marioContext.getCurrentHeight();
                     logService.log("Mario took a Mushroom and became Big Mario!");
-                } else { // Star
-                    marioContext = new Star(marioContext);
+                } else if (powerUp.getType().equals("Star")) {
                     marioContext.setState(new InvincibleMario());
+                    mario.height = marioContext.getCurrentHeight();
                     logService.log("Mario took a Star and became Invincible!");
                 }
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public void dispose() {
