@@ -5,12 +5,22 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.LinkedList;
 
-public    class LogService {
+public class LogService {
     private static final int MAX_LOGS = 5;
     private final LinkedList<String> logs;
 
-    public LogService() {
+    private static LogService instance;
+
+
+    private LogService() {
         logs = new LinkedList<>();
+    }
+
+    public static LogService getInstance() {
+        if (instance == null) {
+            instance = new LogService();
+        }
+        return instance;
     }
 
     public void log(String message) {
