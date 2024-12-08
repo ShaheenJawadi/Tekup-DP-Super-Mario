@@ -29,7 +29,7 @@ public class Main extends ApplicationAdapter {
     private LogService logService;
     private ArrayList<Rectangle> obstacles;
     private ArrayList<Rectangle> powerUps;
-    private float worldScrollSpeed = 200;
+    private float cameraOffset;
 
     @Override
     public void create() {
@@ -44,6 +44,7 @@ public class Main extends ApplicationAdapter {
 
         obstacles = new ArrayList<>();
         powerUps = new ArrayList<>();
+        cameraOffset = 0;
 
         generateLevel();
     }
@@ -75,12 +76,12 @@ public class Main extends ApplicationAdapter {
 
         shapeRenderer.setColor(Color.GRAY);
         for (Rectangle obstacle : obstacles) {
-            shapeRenderer.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            shapeRenderer.rect(obstacle.x - cameraOffset, obstacle.y, obstacle.width, obstacle.height);
         }
 
         for (Rectangle powerUp : powerUps) {
             shapeRenderer.setColor(powerUps.indexOf(powerUp) == 0 ? Color.GREEN : Color.YELLOW);
-            shapeRenderer.rect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+            shapeRenderer.rect(powerUp.x - cameraOffset, powerUp.y, powerUp.width, powerUp.height);
         }
 
         shapeRenderer.end();
@@ -91,55 +92,65 @@ public class Main extends ApplicationAdapter {
     }
 
     private void handleInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            mario.x -= 200 * Gdx.graphics.getDeltaTime();
+        float delta = Gdx.graphics.getDeltaTime();
+        float speed = 200 * delta;
+
+        float leftBoundary = 100;
+        float rightBoundary = Gdx.graphics.getWidth() * 0.7f;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && mario.x > leftBoundary) {
+            mario.x -= speed;
+
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            mario.x += 200 * Gdx.graphics.getDeltaTime();
+
+            if (mario.x < rightBoundary) {
+                mario.x += speed;
+            } else {
+
+                cameraOffset += speed;
+            }
+
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             mario.y += 50;
+
         }
     }
+
 
     private void updateLevel() {
-        float delta = Gdx.graphics.getDeltaTime();
+        // Remove obstacles and power-ups that are off-screen
+        obstacles.removeIf(obstacle -> obstacle.x - cameraOffset + obstacle.width < 0);
+        powerUps.removeIf(powerUp -> powerUp.x - cameraOffset + powerUp.width < 0);
 
-
-        for (Rectangle obstacle : obstacles) {
-            obstacle.x -= worldScrollSpeed * delta;
+        // Add new obstacles and power-ups dynamically
+        while (obstacles.size() < 5) {
+            obstacles.add(new Rectangle(cameraOffset + Gdx.graphics.getWidth() + (float) Math.random() * 300, 100, 50, 50));
         }
-        for (Rectangle powerUp : powerUps) {
-            powerUp.x -= worldScrollSpeed * delta;
-        }
-
-
-        obstacles.removeIf(obstacle -> obstacle.x + obstacle.width < 0);
-        powerUps.removeIf(powerUp -> powerUp.x + powerUp.width < 0);
-
-
-        if (obstacles.size() < 5) {
-            obstacles.add(new Rectangle(600 + (float) Math.random() * 300, 100, 50, 50));
-        }
-        if (powerUps.size() < 2) {
-            powerUps.add(new Rectangle(1200 + (float) Math.random() * 300, 150, 30, 30));
+        while (powerUps.size() < 2) {
+            powerUps.add(new Rectangle(cameraOffset + Gdx.graphics.getWidth() + (float) Math.random() * 300, 150, 30, 30));
         }
     }
 
+
     private void checkCollisions() {
-        // Check collisions
+        // Check collisions with power-ups
         Iterator<Rectangle> powerUpIterator = powerUps.iterator();
         while (powerUpIterator.hasNext()) {
             Rectangle powerUp = powerUpIterator.next();
-            if (mario.overlaps(powerUp)) {
+            if (mario.overlaps(new Rectangle(powerUp.x - cameraOffset, powerUp.y, powerUp.width, powerUp.height))) {
                 powerUpIterator.remove();
 
                 if (powerUps.indexOf(powerUp) == 0) { // Mushroom
                     marioContext = new Mushroom(marioContext);
                     marioContext.setState(new BigMario());
+                    mario.height = marioContext.getCurrentHeight();
+                    logService.log("Mario took a Mushroom and became Big Mario!");
                 } else { // Star
                     marioContext = new Star(marioContext);
                     marioContext.setState(new InvincibleMario());
+                    logService.log("Mario took a Star and became Invincible!");
                 }
             }
         }
