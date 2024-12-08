@@ -93,15 +93,6 @@ public class Main extends ApplicationAdapter {
         spriteBatch.end();
     }
 
-    private void generateLevel() {
-        for (int i = 1; i <= 5; i++) {
-            obstacles.add(new Rectangle(300 * i, 100, 50, 50));
-        }
-
-        powerUps.add(new PowerUp(new Rectangle(350, 150, 30, 30), "Mushroom"));
-        powerUps.add(new PowerUp(new Rectangle(700, 150, 30, 30), "Star"));
-    }
-
     private void updateLevel() {
         velocityY += gravity * Gdx.graphics.getDeltaTime();
         mario.y += velocityY * Gdx.graphics.getDeltaTime();
@@ -114,46 +105,80 @@ public class Main extends ApplicationAdapter {
 
         cameraOffset = mario.x - 100;
 
-        if(!(marioContext.getState() instanceof InvincibleMario)){
+        if (!(marioContext.getState() instanceof Star)) {
+            for (Rectangle obstacle : obstacles) {
+                if (mario.overlaps(obstacle)) {
+                    // Handle horizontal collisions
+                    if (mario.x < obstacle.x) {
+                        mario.x = obstacle.x - mario.width;
+                    } else if (mario.x > obstacle.x + obstacle.width) {
+                        mario.x = obstacle.x + obstacle.width;
+                    }
 
+                    // Handle vertical collisions
+                    if (mario.y > obstacle.y + obstacle.height) {
+                        mario.y = obstacle.y + obstacle.height;
+                        velocityY = 0;
+                        isJumping = false;
+                    } else if (mario.y + mario.height < obstacle.y) {
+                        velocityY = Math.min(velocityY, 0);
+                    }
 
-        for (Rectangle obstacle : obstacles) {
-            if (mario.overlaps(obstacle)) {
-                if (mario.x < obstacle.x) {
-                    mario.x = obstacle.x - mario.width;
-                } else if (mario.x > obstacle.x + obstacle.width) {
-                    mario.x = obstacle.x + obstacle.width;
-                }
-            }
-
-            if (mario.overlaps(obstacle)) {
-                if (mario.y > obstacle.y + obstacle.height) {
-                    mario.y = obstacle.y + obstacle.height;
-                    velocityY = 0;
-                    isJumping = false;
-                } else if (mario.y + mario.height < obstacle.y) {
-                    velocityY = Math.min(velocityY, 0);
+                    marioContext.takeDamage();
+                    mario.height = marioContext.getCurrentHeight();
                 }
             }
         }
-    }
+
+        // Update obstacles positions
         for (Rectangle obstacle : obstacles) {
             if (obstacle.x + obstacle.width < cameraOffset) {
                 obstacle.x = mario.x + 800 + (float) Math.random() * 300;
             }
         }
 
-        for (PowerUp powerUp : powerUps) {
+
+        Iterator<PowerUp> powerUpIterator = powerUps.iterator();
+        while (powerUpIterator.hasNext()) {
+            PowerUp powerUp = powerUpIterator.next();
+
+
             if (powerUp.getBounds().x + powerUp.getBounds().width < cameraOffset) {
-                powerUp.getBounds().x = mario.x + 800 + (float) Math.random() * 300;
+
+                powerUpIterator.remove();
+
+                String type = Math.random() < 0.5 ? "Mushroom" : "Star";
+                float newX = mario.x + 800 + (float) Math.random() * 300;
+                float newY = 150 + (float) Math.random() * 100;
+
+                powerUps.add(new PowerUp(new Rectangle(newX, newY, 30, 30), type));
             }
         }
+
+        while (powerUps.size() < 2) {
+            String type = Math.random() < 0.5 ? "Mushroom" : "Star";
+            float newX = mario.x + 800 + (float) Math.random() * 300;
+            float newY = 150 + (float) Math.random() * 100;
+
+            powerUps.add(new PowerUp(new Rectangle(newX, newY, 30, 30), type));
+        }
     }
+
+    private void generateLevel() {
+        for (int i = 1; i <= 5; i++) {
+            obstacles.add(new Rectangle(300 * i, 100, 50, 50));
+        }
+
+        powerUps.add(new PowerUp(new Rectangle(350, 150, 30, 30), "Mushroom"));
+        powerUps.add(new PowerUp(new Rectangle(700, 150, 30, 30), "Star"));
+    }
+
+
+
 
     private void updateTimers() {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
-        // Decrease timers
         if (bigMarioTimer > 0) {
             bigMarioTimer -= deltaTime;
             if (bigMarioTimer <= 0) {
